@@ -5,13 +5,13 @@ import { Playfair_Display, Crimson_Text } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
-const _playfairDisplay = Playfair_Display({ 
+const geist = Geist({ subsets: ["latin"], variable: '--font-geist' });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: '--font-geist-mono' });
+const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   variable: '--font-playfair',
 });
-const _crimsonText = Crimson_Text({ 
+const crimsonText = Crimson_Text({
   weight: ['400', '600'],
   subsets: ["latin"],
   variable: '--font-crimson',
@@ -47,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
+      <body className={`${geist.variable} ${geistMono.variable} ${playfairDisplay.variable} ${crimsonText.variable} font-sans antialiased`}>
         {children}
         <Analytics />
       </body>
