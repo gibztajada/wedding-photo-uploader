@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, Heart, Sparkles } from 'lucide-react';
+import { ArrowRight, Heart, Sparkles, Star } from 'lucide-react';
 
 interface PhotoCollection {
   id: string;
@@ -157,7 +157,7 @@ export function LandingPage() {
         <div className="max-w-2xl mx-auto text-center space-y-6">
           {/* Decorative Icon */}
           <div className="flex justify-center">
-            <div className="text-5xl">✨</div>
+            <Star className="w-12 h-12 text-pink-600 fill-pink-600" />
           </div>
 
           <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance">
@@ -184,7 +184,7 @@ export function LandingPage() {
         <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
           Madonna &amp; Gilbert
         </h1>
-        <p className="text-muted-foreground">Thank you for celebrating with us today! 💕</p>
+        <p className="text-muted-foreground">Thank you for celebrating with us today!</p>
       </section>
     </main>
   );
