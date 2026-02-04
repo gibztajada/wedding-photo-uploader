@@ -100,7 +100,7 @@ export default function Home() {
   const heroImage = couplePhoto?.image_url || 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&h=600&fit=crop';
 
   return (
-    <main className="flex h-screen w-full flex-col overflow-hidden bg-gradient-to-b from-[#fdf8f6] via-[#faf5f3] to-[#f8ede8]">
+    <main className="flex h-[100dvh] w-full flex-col overflow-hidden bg-gradient-to-b from-[#fdf8f6] via-[#faf5f3] to-[#f8ede8]">
       {/* Ambient background texture */}
       <div
         className="pointer-events-none fixed inset-0 opacity-30"
@@ -111,23 +111,90 @@ export default function Home() {
         }}
       />
 
+      {/* Couple Names Header */}
+      <header
+        className={`relative z-10 shrink-0 px-4 pt-4 pb-1 text-center md:pt-6 md:pb-2 transition-all duration-700 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+        }`}
+      >
+        {/* Decorative top flourish */}
+        <div className="mb-2 flex items-center justify-center gap-2 md:mb-3">
+          <div className="h-px w-8 bg-gradient-to-r from-transparent via-[#e91e8c]/30 to-[#e91e8c]/50 md:w-16" />
+          <svg className="h-3 w-3 text-[#e91e8c]/60 md:h-4 md:w-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z" />
+          </svg>
+          <div className="h-px w-8 bg-gradient-to-l from-transparent via-[#e91e8c]/30 to-[#e91e8c]/50 md:w-16" />
+        </div>
+
+        {/* Couple Names */}
+        <div className="relative inline-block">
+          {/* Names container */}
+          <h1 className="flex flex-col items-center gap-0 md:flex-row md:gap-3">
+            <span
+              className="text-2xl font-normal tracking-wide text-gray-800 md:text-3xl lg:text-4xl"
+              style={{
+                fontFamily: "var(--font-playfair), Georgia, serif",
+                fontStyle: 'italic',
+              }}
+            >
+              Madonna
+            </span>
+
+            {/* Elegant ampersand with heart */}
+            <span className="relative my-0.5 flex items-center justify-center md:my-0">
+              <span
+                className="text-xl text-[#e91e8c] md:text-2xl lg:text-3xl"
+                style={{
+                  fontFamily: "var(--font-playfair), Georgia, serif",
+                  fontStyle: 'italic',
+                }}
+              >
+                &
+              </span>
+              <Heart className="absolute -right-2 -top-1 h-2 w-2 fill-pink-400/60 text-pink-400/60 md:h-2.5 md:w-2.5" />
+            </span>
+
+            <span
+              className="text-2xl font-normal tracking-wide text-gray-800 md:text-3xl lg:text-4xl"
+              style={{
+                fontFamily: "var(--font-playfair), Georgia, serif",
+                fontStyle: 'italic',
+              }}
+            >
+              Gilbert
+            </span>
+          </h1>
+
+          {/* Subtle underline accent */}
+          <div className="mx-auto mt-1.5 h-0.5 w-16 rounded-full bg-gradient-to-r from-transparent via-[#e91e8c]/40 to-transparent md:mt-2 md:w-24" />
+        </div>
+
+        {/* Wedding date or tagline */}
+        <p
+          className="mt-1.5 text-[10px] uppercase tracking-[0.2em] text-gray-500/80 md:mt-2 md:text-xs"
+          style={{ fontFamily: "var(--font-crimson), Georgia, serif" }}
+        >
+          Our Wedding Celebration
+        </p>
+      </header>
+
       {/* Hero Section */}
-      <section className="relative flex flex-1 flex-col px-4 py-4 md:px-8 md:py-6">
-        <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col">
+      <section className="relative flex min-h-0 flex-1 flex-col px-3 pb-3 md:px-8 md:pb-6">
+        <div className="mx-auto flex w-full max-w-2xl min-h-0 flex-1 flex-col">
           {/* Hero Image Container with elegant frame */}
           <div
-            className={`group relative flex-1 transition-all duration-1000 ease-out ${
+            className={`group relative min-h-0 flex-1 transition-all duration-1000 ease-out ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
             {/* Outer decorative border */}
-            <div className="absolute -inset-1 rounded-[2.75rem] bg-gradient-to-br from-pink-200/50 via-white/30 to-rose-200/50 blur-sm md:-inset-2" />
+            <div className="absolute -inset-1 rounded-[2.25rem] md:rounded-[2.75rem] bg-gradient-to-br from-pink-200/50 via-white/30 to-rose-200/50 blur-sm md:-inset-2" />
 
             {/* Golden inner glow */}
-            <div className="absolute -inset-0.5 rounded-[2.6rem] bg-gradient-to-br from-amber-100/20 via-transparent to-rose-100/20" />
+            <div className="absolute -inset-0.5 rounded-[2.1rem] md:rounded-[2.6rem] bg-gradient-to-br from-amber-100/20 via-transparent to-rose-100/20" />
 
             {/* Main container */}
-            <div className="relative h-full overflow-hidden rounded-[2.5rem] shadow-[0_25px_60px_-12px_rgba(0,0,0,0.15),0_0_40px_-5px_rgba(233,30,140,0.1)]">
+            <div className="relative h-full min-h-0 overflow-hidden rounded-[2rem] md:rounded-[2.5rem] shadow-[0_25px_60px_-12px_rgba(0,0,0,0.15),0_0_40px_-5px_rgba(233,30,140,0.1)]">
 
               {/* Corner flourishes */}
               <CornerFlourish position="top-left" />
@@ -152,6 +219,9 @@ export default function Home() {
                   />
                 )}
               </div>
+
+              {/* Subtle dark overlay for better text readability */}
+              <div className="absolute inset-0 bg-black/25" />
 
               {/* Romantic gradient overlay for depth */}
               <div

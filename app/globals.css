@@ -131,6 +131,19 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Mobile viewport height fix */
+@supports (height: 100dvh) {
+  .h-\[100dvh\] {
+    height: 100dvh;
+  }
+}
+
+@supports not (height: 100dvh) {
+  .h-\[100dvh\] {
+    height: 100vh;
+  }
+}
+
 /* Custom selection color for romantic theme */
 ::selection {
   background-color: rgba(233, 30, 140, 0.2);
