@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { TransitionLink } from '@/components/page-transition';
 import { Camera, Images } from 'lucide-react';
 
 interface CouplePhotoData {
@@ -223,23 +223,23 @@ export default function Home() {
 
           {/* Call to Action Buttons */}
           <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-3 md:gap-4">
-            <Link
+            <TransitionLink
               href="/upload"
               className="group relative flex w-full items-center justify-center gap-1.5 border-2 border-[#2c2c2c] bg-[#2c2c2c] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#f8f4ec] transition-all duration-300 hover:bg-[#f8f4ec] hover:text-[#2c2c2c] sm:w-auto sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm md:px-6 md:py-3 md:text-base"
               style={{ fontFamily: 'Georgia, serif' }}
             >
               <Camera className="h-3.5 w-3.5 transition-transform group-hover:rotate-12 sm:h-4 sm:w-4 md:h-5 md:w-5" />
               Upload Photos
-            </Link>
+            </TransitionLink>
 
-            <Link
+            <TransitionLink
               href="/gallery"
               className="group relative flex w-full items-center justify-center gap-1.5 border-2 border-[#2c2c2c] bg-transparent px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#2c2c2c] transition-all duration-300 hover:bg-[#2c2c2c] hover:text-[#f8f4ec] sm:w-auto sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm md:px-6 md:py-3 md:text-base"
               style={{ fontFamily: 'Georgia, serif' }}
             >
               <Images className="h-3.5 w-3.5 transition-transform group-hover:scale-110 sm:h-4 sm:w-4 md:h-5 md:w-5" />
               View Gallery
-            </Link>
+            </TransitionLink>
           </div>
 
           {/* Footer text */}

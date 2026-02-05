@@ -1,85 +1,284 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface PageTransitionContextType {
-  isTransitioning: boolean;
   startTransition: (href: string) => void;
+  isAnimating: boolean;
 }
 
 const PageTransitionContext = createContext<PageTransitionContextType>({
-  isTransitioning: false,
   startTransition: () => {},
+  isAnimating: false,
 });
 
 export const usePageTransition = () => useContext(PageTransitionContext);
 
-interface PageTransitionProviderProps {
-  children: React.ReactNode;
-}
-
-export function PageTransitionProvider({ children }: PageTransitionProviderProps) {
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward'>('forward');
-  const [pendingHref, setPendingHref] = useState<string | null>(null);
+export function PageTransitionProvider({ children }: { children: React.ReactNode }) {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showFlip, setShowFlip] = useState(false);
+  const [flipPhase, setFlipPhase] = useState<'idle' | 'flipping' | 'done'>('idle');
+  const [flipDirection, setFlipDirection] = useState<'forward' | 'backward'>('forward');
   const router = useRouter();
   const pathname = usePathname();
+  const pendingNavigation = useRef<string | null>(null);
 
-  // Page order for determining flip direction
   const pageOrder = ['/', '/upload', '/gallery', '/admin'];
 
+  // Realistic slow flip timing
+  const FLIP_DURATION = 2500;
+
   const startTransition = useCallback((href: string) => {
-    if (href === pathname) return;
+    if (href === pathname || isAnimating) return;
 
     const currentIndex = pageOrder.indexOf(pathname);
     const targetIndex = pageOrder.indexOf(href);
-
-    // Determine direction based on page order
     const direction = targetIndex > currentIndex ? 'forward' : 'backward';
-    setTransitionDirection(direction);
 
-    setIsTransitioning(true);
-    setPendingHref(href);
+    pendingNavigation.current = href;
+    setFlipDirection(direction);
+    setIsAnimating(true);
+    setFlipPhase('flipping');
+    setShowFlip(true);
 
-    // Navigate after the flip-out animation
+    // Navigate when page is mostly flipped (around 40% through)
     setTimeout(() => {
-      router.push(href);
-    }, 400);
-  }, [pathname, router]);
+      if (pendingNavigation.current) {
+        router.push(pendingNavigation.current);
+      }
+    }, FLIP_DURATION * 0.4);
 
-  // Reset transition state when navigation completes
-  useEffect(() => {
-    if (pendingHref && pathname === pendingHref) {
-      // Small delay to allow flip-in animation
-      setTimeout(() => {
-        setIsTransitioning(false);
-        setPendingHref(null);
-      }, 100);
-    }
-  }, [pathname, pendingHref]);
+    // Complete animation
+    setTimeout(() => {
+      setFlipPhase('done');
+    }, FLIP_DURATION);
+
+    setTimeout(() => {
+      setShowFlip(false);
+      setFlipPhase('idle');
+      setIsAnimating(false);
+      pendingNavigation.current = null;
+    }, FLIP_DURATION + 400);
+  }, [pathname, router, isAnimating, pageOrder]);
+
+  const flipDurationSec = FLIP_DURATION / 1000;
 
   return (
-    <PageTransitionContext.Provider value={{ isTransitioning, startTransition }}>
-      <div className="page-transition-wrapper">
-        {/* Page flip overlay */}
-        <div
-          className={`page-flip-overlay ${isTransitioning ? 'active' : ''} ${transitionDirection}`}
-          aria-hidden="true"
-        >
-          <div className="page-flip-paper">
-            <div className="page-flip-texture" />
-          </div>
-        </div>
+    <PageTransitionContext.Provider value={{ startTransition, isAnimating }}>
+      {/* The actual page content - this is what gets "flipped" visually */}
+      <motion.div
+        animate={{
+          rotateY: flipPhase === 'flipping'
+            ? (flipDirection === 'forward' ? -180 : 180)
+            : 0,
+          z: flipPhase === 'flipping' ? 100 : 0,
+          opacity: flipPhase === 'flipping' ? [1, 1, 0] : 1,
+        }}
+        transition={{
+          duration: flipPhase === 'flipping' ? flipDurationSec : 0,
+          ease: 'easeInOut',
+          opacity: {
+            duration: flipPhase === 'flipping' ? flipDurationSec : 0,
+            times: [0, 0.4, 0.5],
+          }
+        }}
+        style={{
+          position: 'relative',
+          zIndex: flipPhase === 'flipping' ? 100 : 1,
+          transformStyle: 'preserve-3d',
+          transformOrigin: flipDirection === 'forward' ? '0% 50%' : '100% 50%',
+          perspective: '3000px',
+          backfaceVisibility: 'hidden',
+        }}
+      >
+        {/* Paper texture overlay that appears during flip */}
+        <AnimatePresence>
+          {flipPhase === 'flipping' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.3, 0.5, 0.3, 0] }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: flipDurationSec,
+                times: [0, 0.2, 0.5, 0.8, 1],
+              }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                zIndex: 1000,
+                pointerEvents: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                mixBlendMode: 'multiply',
+              }}
+            />
+          )}
+        </AnimatePresence>
 
-        {/* Main content with flip animation */}
-        <div
-          className={`page-content ${isTransitioning ? `flipping-out ${transitionDirection}` : 'flipping-in'}`}
-        >
-          {children}
-        </div>
-      </div>
+        {/* Spine shadow during flip */}
+        <AnimatePresence>
+          {flipPhase === 'flipping' && (
+            <motion.div
+              initial={{ opacity: 0, width: '0px' }}
+              animate={{
+                opacity: [0, 0.3, 0.5, 0.3, 0],
+                width: ['0px', '80px', '150px', '80px', '0px'],
+              }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: flipDurationSec,
+                times: [0, 0.2, 0.5, 0.8, 1],
+              }}
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: flipDirection === 'forward' ? 0 : 'auto',
+                right: flipDirection === 'backward' ? 0 : 'auto',
+                zIndex: 1001,
+                pointerEvents: 'none',
+                background: flipDirection === 'forward'
+                  ? 'linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 100%)'
+                  : 'linear-gradient(-90deg, rgba(0,0,0,0.6) 0%, transparent 100%)',
+              }}
+            />
+          )}
+        </AnimatePresence>
+
+        {children}
+      </motion.div>
+
+      {/* The back of the page (paper texture) - revealed as page flips */}
+      <AnimatePresence>
+        {showFlip && (
+          <motion.div
+            initial={{
+              rotateY: flipDirection === 'forward' ? 180 : -180,
+              opacity: 0,
+            }}
+            animate={{
+              rotateY: flipPhase === 'flipping'
+                ? (flipDirection === 'forward' ? [180, 90, 0] : [-180, -90, 0])
+                : 0,
+              opacity: flipPhase === 'flipping' ? [0, 0, 1] : 0,
+            }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: flipDurationSec,
+              ease: 'easeInOut',
+              opacity: {
+                times: [0, 0.4, 0.5],
+              },
+              rotateY: {
+                times: [0, 0.5, 1],
+              }
+            }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 50,
+              transformStyle: 'preserve-3d',
+              transformOrigin: flipDirection === 'forward' ? '0% 50%' : '100% 50%',
+              backfaceVisibility: 'hidden',
+              background: 'linear-gradient(135deg, #ece7df 0%, #e6e1d9 30%, #dfdad2 60%, #d8d3cb 100%)',
+            }}
+          >
+            {/* Paper texture on back */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                opacity: 0.5,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                mixBlendMode: 'multiply',
+              }}
+            />
+
+            {/* Faint lines */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '10%',
+                bottom: '10%',
+                left: '8%',
+                right: '8%',
+                opacity: 0.05,
+                background: `repeating-linear-gradient(
+                  0deg,
+                  transparent,
+                  transparent 30px,
+                  #2c2c2c 30px,
+                  #2c2c2c 31px
+                )`,
+              }}
+            />
+
+            {/* Spine shadow on back of page */}
+            <motion.div
+              animate={{
+                opacity: [0, 0.2, 0.4, 0.2, 0],
+              }}
+              transition={{
+                duration: flipDurationSec,
+                times: [0, 0.25, 0.5, 0.75, 1],
+              }}
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: flipDirection === 'backward' ? 0 : 'auto',
+                right: flipDirection === 'forward' ? 0 : 'auto',
+                width: '200px',
+                background: flipDirection === 'backward'
+                  ? 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)'
+                  : 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)',
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Ground shadow */}
+      <AnimatePresence>
+        {flipPhase === 'flipping' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: [0, 0.4, 0.6, 0.4, 0],
+              scaleX: [1, 0.9, 0.7, 0.9, 0.5],
+              x: flipDirection === 'forward'
+                ? ['0%', '-10%', '-25%', '-35%', '-45%']
+                : ['0%', '10%', '25%', '35%', '45%'],
+            }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: flipDurationSec,
+              times: [0, 0.2, 0.5, 0.8, 1],
+            }}
+            style={{
+              position: 'fixed',
+              bottom: '0',
+              left: '5%',
+              right: '5%',
+              height: '100px',
+              zIndex: 99,
+              background: 'radial-gradient(ellipse 100% 50% at 50% 100%, rgba(0,0,0,0.7) 0%, transparent 70%)',
+              filter: 'blur(40px)',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Perspective container for 3D effect */}
+      <style jsx global>{`
+        body {
+          perspective: ${flipPhase === 'flipping' ? '3000px' : 'none'};
+          perspective-origin: ${flipDirection === 'forward' ? '0% 50%' : '100% 50%'};
+        }
+      `}</style>
     </PageTransitionContext.Provider>
   );
 }
@@ -93,12 +292,11 @@ interface TransitionLinkProps {
 }
 
 export function TransitionLink({ href, children, className, style, title }: TransitionLinkProps) {
-  const { startTransition, isTransitioning } = usePageTransition();
+  const { startTransition, isAnimating } = usePageTransition();
   const pathname = usePathname();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // Don't transition if same page or already transitioning
-    if (href === pathname || isTransitioning) {
+    if (href === pathname || isAnimating) {
       e.preventDefault();
       return;
     }

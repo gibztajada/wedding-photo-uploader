@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { TransitionLink } from '@/components/page-transition';
 import { NewspaperLayout, NewspaperCard, NewspaperButton, NewspaperInput } from '@/components/newspaper-layout';
 import { Camera, X, Upload, ImagePlus } from 'lucide-react';
 
@@ -356,14 +356,14 @@ export default function UploadPage() {
 
       {/* View Gallery Link */}
       <div className="mt-4 text-center sm:mt-5">
-        <Link
+        <TransitionLink
           href="/gallery"
           className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-[#2c2c2c]/60 transition-colors hover:text-[#2c2c2c] sm:text-xs"
           style={{ fontFamily: 'Georgia, serif' }}
         >
           <Camera className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
           View the Photo Gallery
-        </Link>
+        </TransitionLink>
       </div>
     </NewspaperLayout>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import Link from 'next/link';
+import { TransitionLink } from '@/components/page-transition';
 import { NewspaperLayout, NewspaperButton } from '@/components/newspaper-layout';
 import { Trash2, X, ChevronLeft, ChevronRight, Camera, ImageOff } from 'lucide-react';
 
@@ -247,12 +247,12 @@ export default function GalleryPage() {
           >
             Be the first to contribute to our wedding collection!
           </p>
-          <Link href="/upload">
+          <TransitionLink href="/upload">
             <NewspaperButton>
               <Camera className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Submit a Photograph
             </NewspaperButton>
-          </Link>
+          </TransitionLink>
         </div>
       ) : (
         <>
@@ -342,12 +342,12 @@ export default function GalleryPage() {
 
           {/* Action Buttons */}
           <div className="mt-6 flex justify-center sm:mt-8">
-            <Link href="/upload">
+            <TransitionLink href="/upload">
               <NewspaperButton variant="secondary">
                 <Camera className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 Submit More Photographs
               </NewspaperButton>
-            </Link>
+            </TransitionLink>
           </div>
 
           {/* Infinite scroll loader */}
