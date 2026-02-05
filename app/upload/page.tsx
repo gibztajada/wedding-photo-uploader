@@ -3,15 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { RomanticLayout, RomanticCard } from '@/components/romantic-layout';
-import { Camera, X, Upload, Heart, ImagePlus } from 'lucide-react';
+import { NewspaperLayout, NewspaperCard, NewspaperButton, NewspaperInput } from '@/components/newspaper-layout';
+import { Camera, X, Upload, ImagePlus } from 'lucide-react';
 
 interface PreviewItem {
   file: File;
   preview: string;
 }
 
-// Compress image using canvas
 const compressImage = async (
   file: File,
   quality: number = 0.7,
@@ -87,7 +86,7 @@ export default function UploadPage() {
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      setCompressionProgress('Preparing your beautiful memories...');
+      setCompressionProgress('Preparing your photographs...');
       const fileArray = Array.from(files);
 
       const compressionPromises = fileArray.map(async (file) => {
@@ -131,7 +130,7 @@ export default function UploadPage() {
     e.preventDefault();
 
     if (selectedImages.length === 0 || !guestName.trim()) {
-      setError('Please select at least one photo and enter your name');
+      setError('Please select at least one photograph and enter your name');
       return;
     }
 
@@ -176,181 +175,196 @@ export default function UploadPage() {
   };
 
   return (
-    <RomanticLayout
-      title="Share Your Moments"
-      subtitle="Upload your cherished photos to share with everyone"
+    <NewspaperLayout
+      title="SUBMIT YOUR PHOTOGRAPHS"
+      subtitle="Share your captured moments with the wedding collection"
+      pageNumber={2}
       showBack={true}
     >
-      <div className="relative mx-auto max-w-2xl">
-        <RomanticCard>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Image Previews Grid */}
-            {selectedImages.length > 0 && (
-              <div
-                className={`grid grid-cols-2 gap-3 md:grid-cols-3 transition-all duration-500 ${
-                  isVisible ? 'opacity-100' : 'opacity-0'
-                }`}
-              >
-                {selectedImages.map((item, index) => (
-                  <div
-                    key={index}
-                    className="group relative aspect-square overflow-hidden rounded-xl border-2 border-pink-100 bg-pink-50 shadow-sm transition-all duration-300 hover:shadow-md"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <img
-                      src={item.preview || '/placeholder.svg'}
-                      alt={`Preview ${index + 1}`}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                    {/* Upload Progress */}
-                    {isLoading && uploadProgress[index] !== undefined && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full border-4 border-white/30 border-t-white">
-                          <span className="text-xs font-semibold text-white">
-                            {uploadProgress[index]}%
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      disabled={isLoading}
-                      className="absolute right-2 top-2 rounded-full bg-white/90 p-1.5 shadow-md transition-all duration-200 hover:bg-[#e91e8c] hover:text-white disabled:opacity-50"
-                      title="Remove photo"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                    <div className="absolute bottom-1.5 left-1.5 rounded-full bg-[#e91e8c]/90 px-2 py-0.5 text-xs font-medium text-white shadow-sm">
-                      {index + 1}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+      <NewspaperCard>
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+          {/* Section Header */}
+          <div className="border-b border-[#2c2c2c]/20 pb-2">
+            <h2
+              className="text-xs font-bold uppercase tracking-wider text-[#2c2c2c] sm:text-sm"
+              style={{ fontFamily: 'Georgia, serif' }}
+            >
+              Photo Submission Form
+            </h2>
+          </div>
 
-            {/* Image Input Area */}
-            <div className="space-y-3">
-              <label
-                className="block text-sm font-medium text-gray-700"
-                style={{ fontFamily: "var(--font-crimson), Georgia, serif" }}
-              >
-                Select Your Photos
-              </label>
-              <label
-                className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-pink-200 bg-gradient-to-b from-pink-50/50 to-white p-8 transition-all duration-300 hover:border-[#e91e8c]/50 hover:bg-pink-50 ${
-                  isLoading || compressionProgress ? 'pointer-events-none opacity-50' : ''
-                }`}
-              >
-                <div className="mb-3 rounded-full bg-pink-100 p-3">
-                  <ImagePlus className="h-6 w-6 text-[#e91e8c]" />
-                </div>
-                <p
-                  className="mb-1 text-sm font-medium text-gray-600"
-                  style={{ fontFamily: "var(--font-crimson), Georgia, serif" }}
+          {/* Image Previews Grid */}
+          {selectedImages.length > 0 && (
+            <div
+              className={`grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 transition-all duration-500 ${
+                isVisible ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              {selectedImages.map((item, index) => (
+                <div
+                  key={index}
+                  className="group relative aspect-square overflow-hidden border border-[#2c2c2c]/30 bg-[#2c2c2c]"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  Click to select photos
-                </p>
-                <p className="text-xs text-gray-400">or drag and drop</p>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageSelect}
-                  disabled={isLoading || compressionProgress !== ''}
-                  className="hidden"
-                />
-              </label>
-              {compressionProgress && (
-                <div className="flex items-center justify-center gap-2 text-sm text-[#e91e8c]">
-                  <Heart className="h-4 w-4 animate-pulse fill-current" />
-                  {compressionProgress}
+                  <img
+                    src={item.preview || '/placeholder.svg'}
+                    alt={`Preview ${index + 1}`}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    style={{
+                      filter: 'grayscale(30%) contrast(1.05)',
+                    }}
+                  />
+                  {/* Upload Progress */}
+                  {isLoading && uploadProgress[index] !== undefined && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#2c2c2c]/70">
+                      <span
+                        className="text-xs font-bold text-[#f8f4ec] sm:text-sm"
+                        style={{ fontFamily: 'Georgia, serif' }}
+                      >
+                        {uploadProgress[index]}%
+                      </span>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    disabled={isLoading}
+                    className="absolute right-1 top-1 bg-[#f8f4ec] p-1 text-[#2c2c2c] shadow-sm transition-all duration-200 hover:bg-[#2c2c2c] hover:text-[#f8f4ec] disabled:opacity-50"
+                    title="Remove photo"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  <div
+                    className="absolute bottom-1 left-1 bg-[#f8f4ec] px-1.5 py-0.5 text-[8px] font-bold text-[#2c2c2c] sm:text-[10px]"
+                    style={{ fontFamily: 'Georgia, serif' }}
+                  >
+                    No. {index + 1}
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
+          )}
 
-            {/* Name Input */}
-            <div className="space-y-3">
-              <label
-                className="block text-sm font-medium text-gray-700"
-                style={{ fontFamily: "var(--font-crimson), Georgia, serif" }}
-              >
-                Your Name
-              </label>
-              <input
-                type="text"
-                placeholder="Enter your name"
-                value={guestName}
-                onChange={(e) => setGuestName(e.target.value)}
-                disabled={isLoading}
-                className="w-full rounded-xl border border-pink-200/50 bg-white/70 px-4 py-3 text-gray-800 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-[#e91e8c]/50 focus:outline-none focus:ring-2 focus:ring-[#e91e8c]/20 disabled:opacity-50"
-                style={{ fontFamily: "var(--font-crimson), Georgia, serif" }}
-              />
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-                <p className="text-sm text-red-600">{error}</p>
+          {/* Image Input Area */}
+          <div className="space-y-2">
+            <label
+              className="block text-[10px] font-medium uppercase tracking-wider text-[#2c2c2c]/80 sm:text-xs"
+              style={{ fontFamily: 'Georgia, serif' }}
+            >
+              Select Photographs
+            </label>
+            <label
+              className={`flex cursor-pointer flex-col items-center justify-center border-2 border-dashed border-[#2c2c2c]/30 bg-[#faf6ee] p-4 transition-all duration-300 hover:border-[#2c2c2c]/60 hover:bg-[#f5f0e6] sm:p-6 ${
+                isLoading || compressionProgress ? 'pointer-events-none opacity-50' : ''
+              }`}
+            >
+              <div className="mb-2 border border-[#2c2c2c]/20 p-2">
+                <ImagePlus className="h-5 w-5 text-[#2c2c2c]/60 sm:h-6 sm:w-6" />
               </div>
-            )}
-
-            {/* Photo Count */}
-            {selectedImages.length > 0 && (
               <p
-                className="text-center text-sm text-gray-500"
-                style={{ fontFamily: "var(--font-crimson), Georgia, serif" }}
+                className="text-xs font-medium text-[#2c2c2c]/80 sm:text-sm"
+                style={{ fontFamily: 'Georgia, serif' }}
               >
-                {selectedImages.length} photo{selectedImages.length !== 1 ? 's' : ''} ready to share
+                Click to select photographs
+              </p>
+              <p
+                className="mt-1 text-[9px] text-[#2c2c2c]/50 sm:text-[10px]"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
+                Multiple images may be selected
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageSelect}
+                disabled={isLoading || compressionProgress !== ''}
+                className="hidden"
+              />
+            </label>
+            {compressionProgress && (
+              <p
+                className="text-center text-[10px] italic text-[#2c2c2c]/60 sm:text-xs"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
+                {compressionProgress}
               </p>
             )}
+          </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading || selectedImages.length === 0 || !guestName.trim()}
-              className="group relative w-full overflow-hidden rounded-full bg-gradient-to-r from-[#e91e8c] to-[#d42a78] px-6 py-3.5 text-sm font-medium text-white shadow-[0_4px_20px_rgba(233,30,140,0.3)] transition-all duration-300 hover:shadow-[0_6px_30px_rgba(233,30,140,0.4)] hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+          {/* Name Input */}
+          <NewspaperInput
+            label="Your Name"
+            placeholder="Enter your name for the photo credit"
+            value={guestName}
+            onChange={(e) => setGuestName(e.target.value)}
+            disabled={isLoading}
+          />
+
+          {/* Error Message */}
+          {error && (
+            <div className="border border-[#2c2c2c]/30 bg-[#f5f0e6] p-3">
+              <p
+                className="text-xs text-[#8b0000]"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
+                {error}
+              </p>
+            </div>
+          )}
+
+          {/* Photo Count */}
+          {selectedImages.length > 0 && (
+            <p
+              className="text-center text-[10px] text-[#2c2c2c]/60 sm:text-xs"
+              style={{ fontFamily: 'Georgia, serif' }}
             >
-              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-              <span className="relative flex items-center justify-center gap-2">
-                {isLoading ? (
-                  <>
-                    <svg
-                      className="h-4 w-4 animate-spin"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
-                      <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
-                    </svg>
-                    Uploading {selectedImages.length} photo{selectedImages.length !== 1 ? 's' : ''}...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="h-4 w-4" />
-                    Upload {selectedImages.length > 0 ? selectedImages.length : ''} Photo
-                    {selectedImages.length !== 1 ? 's' : ''}
-                  </>
-                )}
-              </span>
-            </button>
-          </form>
-        </RomanticCard>
+              {selectedImages.length} photograph{selectedImages.length !== 1 ? 's' : ''} ready for submission
+            </p>
+          )}
 
-        {/* View Gallery Link */}
-        <div className="mt-6 text-center">
-          <Link
-            href="/gallery"
-            className="inline-flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-[#e91e8c]"
-            style={{ fontFamily: "var(--font-crimson), Georgia, serif" }}
+          {/* Submit Button */}
+          <NewspaperButton
+            type="submit"
+            disabled={isLoading || selectedImages.length === 0 || !guestName.trim()}
+            className="w-full"
           >
-            <Camera className="h-4 w-4" />
-            View shared photos in the gallery
-          </Link>
-        </div>
+            {isLoading ? (
+              <>
+                <svg
+                  className="h-3.5 w-3.5 animate-spin sm:h-4 sm:w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
+                  <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+                </svg>
+                Submitting {selectedImages.length} photograph{selectedImages.length !== 1 ? 's' : ''}...
+              </>
+            ) : (
+              <>
+                <Upload className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                Submit {selectedImages.length > 0 ? selectedImages.length : ''} Photograph
+                {selectedImages.length !== 1 ? 's' : ''}
+              </>
+            )}
+          </NewspaperButton>
+        </form>
+      </NewspaperCard>
+
+      {/* View Gallery Link */}
+      <div className="mt-4 text-center sm:mt-5">
+        <Link
+          href="/gallery"
+          className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-[#2c2c2c]/60 transition-colors hover:text-[#2c2c2c] sm:text-xs"
+          style={{ fontFamily: 'Georgia, serif' }}
+        >
+          <Camera className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+          View the Photo Gallery
+        </Link>
       </div>
-    </RomanticLayout>
+    </NewspaperLayout>
   );
 }
