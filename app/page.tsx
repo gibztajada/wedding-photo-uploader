@@ -37,7 +37,7 @@ export default function Home() {
 
   return (
     <main
-      className="flex min-h-[100dvh] w-full items-center justify-center overflow-x-hidden p-2 sm:p-4"
+      className="flex h-[100dvh] flex-col w-full overflow-hidden p-2 sm:p-4"
       style={{
         background: `
           linear-gradient(180deg, #f5f0e8 0%, #ede6da 50%, #e8e0d0 100%)
@@ -54,13 +54,13 @@ export default function Home() {
 
       {/* Newspaper Container */}
       <div
-        className={`relative w-full max-w-2xl transition-all duration-1000 ${
+        className={`relative mx-auto w-full max-w-2xl flex-1 flex flex-col transition-all duration-1000 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}
       >
         {/* Main Newspaper Frame */}
         <div
-          className="relative border-2 border-[#2c2c2c] bg-[#f8f4ec] p-3 shadow-[4px_4px_0_rgba(0,0,0,0.1)] sm:border-[3px] sm:p-4 md:p-6 md:shadow-[8px_8px_0_rgba(0,0,0,0.1)]"
+          className="relative flex flex-1 flex-col border-2 border-[#2c2c2c] bg-[#f8f4ec] p-3 shadow-[4px_4px_0_rgba(0,0,0,0.1)] sm:border-[3px] sm:p-4 md:p-6 md:shadow-[8px_8px_0_rgba(0,0,0,0.1)]"
           style={{
             backgroundImage: `
               linear-gradient(180deg, #faf6ee 0%, #f5f0e6 100%),
@@ -151,106 +151,109 @@ export default function Home() {
             </div>
           </header>
 
-          {/* Main Headline */}
-          <div className="mb-2 text-center sm:mb-3 md:mb-4">
-            <h2
-              className="text-lg leading-tight text-[#2c2c2c] sm:text-xl md:text-3xl lg:text-4xl"
-              style={{
-                fontFamily: 'var(--font-pinyon), "Pinyon Script", cursive',
-                lineHeight: '1.2',
-              }}
-            >
-              Share your captured moments
-            </h2>
-          </div>
+          {/* All content below the masthead — fills the remaining frame height */}
+          <div className="flex flex-1 flex-col min-h-0">
 
-          {/* Photo Section */}
-          <div className="relative mx-auto mb-2 flex justify-center sm:mb-3 md:mb-4">
-            {/* Photo frame */}
-            <div className="relative inline-block border-2 border-[#2c2c2c] bg-[#2c2c2c] p-0.5 sm:border-[3px] sm:p-1">
-              {/* Inner border */}
-              <div className="border border-[#2c2c2c]/20">
-                {isLoading ? (
-                  <div
-                    className="h-32 w-24 animate-pulse bg-gray-300 sm:h-48 sm:w-36 md:h-56 md:w-44"
-                  />
-                ) : (
-                  <img
-                    src={heroImage}
-                    alt="Madonna & Gilbert"
-                    className="block h-32 w-auto sm:h-48 md:h-56 lg:h-64"
-                    style={{
-                      filter: 'grayscale(100%) contrast(1.1) brightness(1.05)',
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Couple Names */}
-          <div className="mb-2 text-center sm:mb-3 md:mb-4">
-            <div className="mb-1 flex items-center justify-center gap-2 sm:mb-2 sm:gap-3 md:gap-4">
-              <div className="h-px flex-1 bg-[#2c2c2c]/40" />
-              <h3
-                className="text-sm font-black uppercase tracking-wide text-[#2c2c2c] sm:text-lg md:text-2xl lg:text-3xl"
+            {/* Main Headline */}
+            <div className="pt-2 pb-1 text-center sm:pt-3 sm:pb-2">
+              <h2
+                className="text-lg leading-tight text-[#2c2c2c] sm:text-xl md:text-3xl lg:text-4xl"
                 style={{
-                  fontFamily: 'var(--font-playfair), Georgia, serif',
-                  letterSpacing: '0.05em',
+                  fontFamily: 'var(--font-pinyon), "Pinyon Script", cursive',
+                  lineHeight: '1.2',
                 }}
               >
-                MADONNA & GILBERT
-              </h3>
-              <div className="h-px flex-1 bg-[#2c2c2c]/40" />
+                Share your captured moments
+              </h2>
             </div>
 
-            <p
-              className="text-sm text-[#2c2c2c]/80 sm:text-base md:text-xl"
-              style={{
-                fontFamily: 'var(--font-pinyon), "Pinyon Script", cursive',
-              }}
-            >
-              capturing our special day
-            </p>
-          </div>
+            {/* Photo Section — flex-1 so it absorbs all the extra height */}
+            <div className="relative flex-1 min-h-0 flex items-center justify-center py-2 sm:py-3">
+              {/* Photo frame */}
+              <div className="relative inline-block border-2 border-[#2c2c2c] bg-[#2c2c2c] p-0.5 sm:border-[3px] sm:p-1">
+                {/* Inner border */}
+                <div className="border border-[#2c2c2c]/20">
+                  {isLoading ? (
+                    <div className="h-32 w-24 animate-pulse bg-gray-300 sm:h-48 sm:w-36" />
+                  ) : (
+                    <img
+                      src={heroImage}
+                      alt="Madonna & Gilbert"
+                      className="block w-auto max-h-[40vh]"
+                      style={{
+                        filter: 'grayscale(100%) contrast(1.1) brightness(1.05)',
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
 
-          {/* Decorative divider */}
-          <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3 md:mb-4">
-            <div className="h-px w-6 bg-[#2c2c2c]/40 sm:w-8 md:w-12" />
-            <span className="text-xs text-[#2c2c2c]/60 sm:text-sm">❧</span>
-            <div className="h-px w-6 bg-[#2c2c2c]/40 sm:w-8 md:w-12" />
-          </div>
+            {/* Couple Names */}
+            <div className="pb-2 text-center sm:pb-3">
+              <div className="mb-1 flex items-center justify-center gap-2 sm:mb-2 sm:gap-3 md:gap-4">
+                <div className="h-px flex-1 bg-[#2c2c2c]/40" />
+                <h3
+                  className="text-sm font-black uppercase tracking-wide text-[#2c2c2c] sm:text-lg md:text-2xl lg:text-3xl"
+                  style={{
+                    fontFamily: 'var(--font-playfair), Georgia, serif',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  MADONNA & GILBERT
+                </h3>
+                <div className="h-px flex-1 bg-[#2c2c2c]/40" />
+              </div>
 
-          {/* Call to Action Buttons */}
-          <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-3 md:gap-4">
-            <TransitionLink
-              href="/upload"
-              className="group relative flex w-full items-center justify-center gap-1.5 border-2 border-[#2c2c2c] bg-[#2c2c2c] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#f8f4ec] transition-all duration-300 hover:bg-[#f8f4ec] hover:text-[#2c2c2c] sm:w-auto sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm md:px-6 md:py-3 md:text-base"
-              style={{ fontFamily: 'Georgia, serif' }}
-            >
-              <Camera className="h-3.5 w-3.5 transition-transform group-hover:rotate-12 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-              Upload Photos
-            </TransitionLink>
+              <p
+                className="text-sm text-[#2c2c2c]/80 sm:text-base md:text-xl"
+                style={{
+                  fontFamily: 'var(--font-pinyon), "Pinyon Script", cursive',
+                }}
+              >
+                capturing our special day
+              </p>
+            </div>
 
-            <TransitionLink
-              href="/gallery"
-              className="group relative flex w-full items-center justify-center gap-1.5 border-2 border-[#2c2c2c] bg-transparent px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#2c2c2c] transition-all duration-300 hover:bg-[#2c2c2c] hover:text-[#f8f4ec] sm:w-auto sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm md:px-6 md:py-3 md:text-base"
-              style={{ fontFamily: 'Georgia, serif' }}
-            >
-              <Images className="h-3.5 w-3.5 transition-transform group-hover:scale-110 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-              View Gallery
-            </TransitionLink>
-          </div>
+            {/* Decorative divider */}
+            <div className="pb-2 flex items-center justify-center gap-2 sm:pb-3">
+              <div className="h-px w-6 bg-[#2c2c2c]/40 sm:w-8 md:w-12" />
+              <span className="text-xs text-[#2c2c2c]/60 sm:text-sm">❧</span>
+              <div className="h-px w-6 bg-[#2c2c2c]/40 sm:w-8 md:w-12" />
+            </div>
 
-          {/* Footer text */}
-          <div className="mt-3 border-t border-[#2c2c2c]/30 pt-2 text-center sm:mt-4 sm:pt-3 md:mt-6 md:pt-4">
-            <p
-              className="text-[8px] uppercase tracking-[0.15em] text-[#2c2c2c]/60 sm:text-[10px] sm:tracking-[0.2em] md:text-xs"
-              style={{ fontFamily: 'Georgia, serif' }}
-            >
-              Help us capture every beautiful moment
-            </p>
-          </div>
+            {/* Call to Action Buttons */}
+            <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-3 md:gap-4">
+              <TransitionLink
+                href="/upload"
+                className="group relative flex w-full items-center justify-center gap-1.5 border-2 border-[#2c2c2c] bg-[#2c2c2c] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#f8f4ec] transition-all duration-300 hover:bg-[#f8f4ec] hover:text-[#2c2c2c] sm:w-auto sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm md:px-6 md:py-3 md:text-base"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
+                <Camera className="h-3.5 w-3.5 transition-transform group-hover:rotate-12 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                Upload Photos
+              </TransitionLink>
+
+              <TransitionLink
+                href="/gallery"
+                className="group relative flex w-full items-center justify-center gap-1.5 border-2 border-[#2c2c2c] bg-transparent px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#2c2c2c] transition-all duration-300 hover:bg-[#2c2c2c] hover:text-[#f8f4ec] sm:w-auto sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm md:px-6 md:py-3 md:text-base"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
+                <Images className="h-3.5 w-3.5 transition-transform group-hover:scale-110 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                View Gallery
+              </TransitionLink>
+            </div>
+
+            {/* Footer text — pinned to bottom of content area */}
+            <div className="mt-auto border-t border-[#2c2c2c]/30 pt-2 text-center sm:pt-3">
+              <p
+                className="text-[8px] uppercase tracking-[0.15em] text-[#2c2c2c]/60 sm:text-[10px] sm:tracking-[0.2em] md:text-xs"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
+                Help us capture every beautiful moment
+              </p>
+            </div>
+
+          </div>{/* end post-header content */}
 
           {/* Bottom decorative border */}
           <div className="absolute bottom-1.5 left-0 right-0 h-px bg-[#2c2c2c] sm:bottom-2" />

@@ -20,7 +20,7 @@ export const usePageTransition = () => useContext(PageTransitionContext);
 export function PageTransitionProvider({ children }: { children: React.ReactNode }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [showFlip, setShowFlip] = useState(false);
-  const [flipPhase, setFlipPhase] = useState<'idle' | 'flipping' | 'done'>('idle');
+  const [flipPhase, setFlipPhase] = useState<'idle' | 'flipping' | 'revealing' | 'done'>('idle');
   const [flipDirection, setFlipDirection] = useState<'forward' | 'backward'>('forward');
   const router = useRouter();
   const pathname = usePathname();
@@ -28,8 +28,7 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
 
   const pageOrder = ['/', '/upload', '/gallery', '/admin'];
 
-  // Realistic slow flip timing
-  const FLIP_DURATION = 2500;
+  const FLIP_DURATION = 1600;
 
   const startTransition = useCallback((href: string) => {
     if (href === pathname || isAnimating) return;
@@ -44,14 +43,20 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
     setFlipPhase('flipping');
     setShowFlip(true);
 
-    // Navigate when page is mostly flipped (around 40% through)
+    // Navigate early so the new page is rendered and ready under the overlay
     setTimeout(() => {
       if (pendingNavigation.current) {
         router.push(pendingNavigation.current);
+        pendingNavigation.current = null;
       }
-    }, FLIP_DURATION * 0.4);
+    }, FLIP_DURATION * 0.35);
 
-    // Complete animation
+    // 'revealing': snap the new page into view and fade the overlay out
+    setTimeout(() => {
+      setFlipPhase('revealing');
+    }, FLIP_DURATION * 0.6);
+
+    // Done
     setTimeout(() => {
       setFlipPhase('done');
     }, FLIP_DURATION);
@@ -60,8 +65,7 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
       setShowFlip(false);
       setFlipPhase('idle');
       setIsAnimating(false);
-      pendingNavigation.current = null;
-    }, FLIP_DURATION + 400);
+    }, FLIP_DURATION + 200);
   }, [pathname, router, isAnimating, pageOrder]);
 
   const flipDurationSec = FLIP_DURATION / 1000;
@@ -78,6 +82,7 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
           opacity: flipPhase === 'flipping' ? [1, 1, 0] : 1,
         }}
         transition={{
+          // Instantly snap back to visible when revealing or done
           duration: flipPhase === 'flipping' ? flipDurationSec : 0,
           ease: 'easeInOut',
           opacity: {
@@ -147,6 +152,60 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
           )}
         </AnimatePresence>
 
+        {/* Fold shadow — dark gradient from spine, simulates page casting shadow on itself as it lifts */}
+        <AnimatePresence>
+          {flipPhase === 'flipping' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.6, 0.9, 0.45, 0] }}
+              exit={{ opacity: 0, transition: { duration: 0.12 } }}
+              transition={{
+                duration: flipDurationSec * 0.62,
+                ease: 'easeInOut',
+                times: [0, 0.18, 0.4, 0.62, 0.85],
+              }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                zIndex: 1002,
+                pointerEvents: 'none',
+                background: flipDirection === 'forward'
+                  ? 'linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 10%, rgba(0,0,0,0.25) 32%, rgba(0,0,0,0.06) 58%, transparent 100%)'
+                  : 'linear-gradient(-90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 10%, rgba(0,0,0,0.25) 32%, rgba(0,0,0,0.06) 58%, transparent 100%)',
+              }}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Fold crease highlight — bright strip at the spine edge (fold line) */}
+        <AnimatePresence>
+          {flipPhase === 'flipping' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.85, 1, 0.55, 0] }}
+              exit={{ opacity: 0, transition: { duration: 0.12 } }}
+              transition={{
+                duration: flipDurationSec * 0.55,
+                ease: 'easeInOut',
+                times: [0, 0.14, 0.32, 0.56, 0.82],
+              }}
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: flipDirection === 'forward' ? 0 : 'auto',
+                right: flipDirection === 'backward' ? 0 : 'auto',
+                width: '28px',
+                zIndex: 1003,
+                pointerEvents: 'none',
+                background: flipDirection === 'forward'
+                  ? 'linear-gradient(90deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.55) 35%, rgba(255,255,255,0.1) 70%, transparent 100%)'
+                  : 'linear-gradient(-90deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.55) 35%, rgba(255,255,255,0.1) 70%, transparent 100%)',
+              }}
+            />
+          )}
+        </AnimatePresence>
+
         {children}
       </motion.div>
 
@@ -166,13 +225,14 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
             }}
             exit={{ opacity: 0 }}
             transition={{
-              duration: flipDurationSec,
+              // When 'revealing' fires, fade out fast so the new page is immediately shown
+              duration: flipPhase === 'flipping' ? flipDurationSec : 0.35,
               ease: 'easeInOut',
               opacity: {
-                times: [0, 0.4, 0.5],
+                times: flipPhase === 'flipping' ? [0, 0.4, 0.5] : undefined,
               },
               rotateY: {
-                times: [0, 0.5, 1],
+                times: flipPhase === 'flipping' ? [0, 0.5, 1] : undefined,
               }
             }}
             style={{
@@ -236,6 +296,44 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
                   : 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)',
               }}
             />
+
+            {/* Fold shadow on incoming page — starts strong (page just unfolded from behind), fades as it settles flat */}
+            <motion.div
+              animate={{ opacity: [0, 0, 0.82, 0.45, 0] }}
+              transition={{
+                duration: flipDurationSec,
+                ease: 'easeOut',
+                times: [0, 0.42, 0.5, 0.72, 1],
+              }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: flipDirection === 'forward'
+                  ? 'linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 12%, rgba(0,0,0,0.22) 38%, rgba(0,0,0,0.05) 62%, transparent 100%)'
+                  : 'linear-gradient(-90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 12%, rgba(0,0,0,0.22) 38%, rgba(0,0,0,0.05) 62%, transparent 100%)',
+              }}
+            />
+
+            {/* Fold crease highlight on incoming page — bright spine edge that fades as page flattens */}
+            <motion.div
+              animate={{ opacity: [0, 0, 0.95, 0.55, 0] }}
+              transition={{
+                duration: flipDurationSec,
+                ease: 'easeOut',
+                times: [0, 0.42, 0.5, 0.68, 1],
+              }}
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: flipDirection === 'forward' ? 0 : 'auto',
+                right: flipDirection === 'backward' ? 0 : 'auto',
+                width: '32px',
+                background: flipDirection === 'forward'
+                  ? 'linear-gradient(90deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.5) 40%, rgba(255,255,255,0.08) 75%, transparent 100%)'
+                  : 'linear-gradient(-90deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.5) 40%, rgba(255,255,255,0.08) 75%, transparent 100%)',
+              }}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -275,7 +373,7 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
       {/* Perspective container for 3D effect */}
       <style jsx global>{`
         body {
-          perspective: ${flipPhase === 'flipping' ? '3000px' : 'none'};
+          perspective: ${(flipPhase === 'flipping' || flipPhase === 'revealing') ? '3000px' : 'none'};
           perspective-origin: ${flipDirection === 'forward' ? '0% 50%' : '100% 50%'};
         }
       `}</style>

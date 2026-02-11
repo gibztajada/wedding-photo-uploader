@@ -30,7 +30,7 @@ export function NewspaperLayout({
 
   return (
     <main
-      className="min-h-[100dvh] w-full overflow-x-hidden py-2 sm:py-4"
+      className="flex min-h-[100dvh] flex-col w-full overflow-x-hidden py-2 sm:py-4"
       style={{
         background: `
           linear-gradient(180deg, #f5f0e8 0%, #ede6da 50%, #e8e0d0 100%)
@@ -47,13 +47,13 @@ export function NewspaperLayout({
 
       {/* Newspaper Container */}
       <div
-        className={`relative mx-auto max-w-2xl px-2 transition-all duration-1000 sm:px-4 ${
+        className={`relative mx-auto w-full max-w-2xl flex-1 flex flex-col px-2 transition-all duration-1000 sm:px-4 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}
       >
         {/* Main Newspaper Frame */}
         <div
-          className="relative border-2 border-[#2c2c2c] bg-[#f8f4ec] p-3 shadow-[4px_4px_0_rgba(0,0,0,0.1)] sm:border-[3px] sm:p-4 md:p-6 md:shadow-[8px_8px_0_rgba(0,0,0,0.1)]"
+          className="relative flex flex-1 flex-col border-2 border-[#2c2c2c] bg-[#f8f4ec] p-3 shadow-[4px_4px_0_rgba(0,0,0,0.1)] sm:border-[3px] sm:p-4 md:p-6 md:shadow-[8px_8px_0_rgba(0,0,0,0.1)]"
           style={{
             backgroundImage: `
               linear-gradient(180deg, #faf6ee 0%, #f5f0e6 100%),
@@ -69,25 +69,25 @@ export function NewspaperLayout({
           <header className="mb-3 border-b-2 border-[#2c2c2c] pb-2 sm:mb-4 sm:border-b-[3px] sm:pb-3 md:mb-5 md:pb-4">
             {/* Navigation and Page Info Row */}
             <div className="mb-2 flex items-center justify-between text-[8px] sm:mb-3 sm:text-[10px] md:text-xs">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 {showBack && (
                   <TransitionLink
                     href="/"
-                    className="flex items-center gap-1 text-[#2c2c2c]/70 transition-colors hover:text-[#2c2c2c]"
+                    className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded text-[#2c2c2c]/70 transition-colors hover:text-[#2c2c2c] active:bg-[#2c2c2c]/10 sm:min-h-0 sm:min-w-0 sm:gap-1 sm:rounded-none sm:p-0"
                     style={{ fontFamily: 'Georgia, serif' }}
                   >
-                    <ArrowLeft className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                    <span className="hidden sm:inline">Back</span>
+                    <ArrowLeft className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+                    <span>Back</span>
                   </TransitionLink>
                 )}
                 {showHome && (
                   <TransitionLink
                     href="/"
-                    className="flex items-center gap-1 text-[#2c2c2c]/70 transition-colors hover:text-[#2c2c2c]"
+                    className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded text-[#2c2c2c]/70 transition-colors hover:text-[#2c2c2c] active:bg-[#2c2c2c]/10 sm:min-h-0 sm:min-w-0 sm:gap-1 sm:rounded-none sm:p-0"
                     style={{ fontFamily: 'Georgia, serif' }}
                   >
-                    <Home className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                    <span className="hidden sm:inline">Home</span>
+                    <Home className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+                    <span>Home</span>
                   </TransitionLink>
                 )}
               </div>
@@ -140,7 +140,7 @@ export function NewspaperLayout({
           </header>
 
           {/* Main Content */}
-          <div className="relative">{children}</div>
+          <div className="relative flex-1">{children}</div>
 
           {/* Footer */}
           <footer className="mt-4 border-t border-[#2c2c2c]/30 pt-3 text-center sm:mt-6 sm:pt-4">

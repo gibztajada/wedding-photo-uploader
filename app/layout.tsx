@@ -51,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geist.variable} ${geistMono.variable} ${playfairDisplay.variable} ${crimsonText.variable} ${unifraktur.variable} ${pinyonScript.variable} font-sans antialiased`}>
+      <body className={`${geist.variable} ${geistMono.variable} ${playfairDisplay.variable} ${crimsonText.variable} ${unifraktur.variable} ${pinyonScript.variable} font-sans antialiased min-h-[100dvh]`}>
         <PageTransitionProvider>
           {children}
         </PageTransitionProvider>
